@@ -1,3 +1,5 @@
+package com.SearchApp;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -30,10 +32,14 @@ public class Search extends HttpServlet{
                 System.out.println(result.getTitle() + "\t" + result.getLink());
             }
 
+            request.setAttribute("results", results);
+            request.getRequestDispatcher("search.jsp").forward(request, response);
+
             response.setContentType("text/html");
             PrintWriter out = response.getWriter();
-
         }catch(SQLException e){
+            e.printStackTrace();
+        } catch (ServletException e) {
             e.printStackTrace();
         }
 
