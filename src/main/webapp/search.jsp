@@ -14,7 +14,7 @@
         %>
         <tr>
             <td><%= result.getTitle() %></td>
-            <td><%= result.getLink() %></td>
+            <td><a href="<%= result.getLink() %>" target="_blank"><%= result.getLink() %></a></td>
         </tr>
         <%
             }
