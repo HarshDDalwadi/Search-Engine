@@ -5,15 +5,38 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 @WebServlet("/Search")
 
-public class Search extends HttpServlet {
+public class Search extends HttpServlet{
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
         String keyword = request.getParameter("keyword");
-        System.out.println(keyword);
-        response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
-        out.println("<h3>Keyword : </h3>" + keyword);
+        Connection connection = DatabaseConnection.getConnection();
+        try{
+            ResultSet resultSet = connection.createStatement().executeQuery("SELECT pageTitle, pageLink, (LENGTH(LOWER(pageText)) - LENGTH(REPLACE(LOWER(pageText),'"+keyword.toLowerCase()+"', '')))/LENGTH('"+keyword.toLowerCase()+"')  AS COUNT FROM pages ORDER BY COUNT DESC LIMIT 30");
+            ArrayList<SearchResult> results = new ArrayList<SearchResult>();
+            while(resultSet.next()){
+                SearchResult result = new SearchResult();
+                result.setTitle(resultSet.getString("pageTitle"));
+                result.setLink(resultSet.getString("pageLink"));
+                results.add(result);
+            }
+
+            for(SearchResult result : results){
+                System.out.println(result.getTitle() + "\t" + result.getLink());
+            }
+
+            response.setContentType("text/html");
+            PrintWriter out = response.getWriter();
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
+
     }
 }
